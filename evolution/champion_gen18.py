@@ -450,7 +450,7 @@ class Context:
         self.owner_power = dict(power)
         self.active_owners = sorted(power)
         self.is_duel = len(self.active_owners) <= 2
-        self.duel_opening = self.is_duel and w.step < 46
+        self.duel_opening = self.is_duel and w.step < 59
         enemies = [o for o in power if o != w.player]
         self.leader_owner = max(enemies, key=lambda o: power[o]) if enemies else -1
         self.weakest_enemy_owner = (
@@ -458,7 +458,7 @@ class Context:
         )
         leader_power = power.get(self.leader_owner, 0.0)
         my_power = power.get(w.player, 0.0)
-        self.ffa_opening = (not self.is_duel) and w.step < 46
+        self.ffa_opening = (not self.is_duel) and w.step < 51
         self.ffa_behind = (
             (not self.is_duel) and
             70 <= w.step < 155 and
@@ -593,25 +593,25 @@ class Context:
             if t.id in _MEMORY["blacklist"] and _MEMORY["blacklist"][t.id] > _MEMORY["turn"]:
                 continue
             # Static value of capturing this planet.
-            base = t.production * (92.0 if t.owner == -1 else 83.5)
+            base = t.production * (92.0 if t.owner == -1 else 113.6)
             if self.duel_opening and t.owner == -1:
                 base += t.production * 77.0
-                base += max(0.0, 19.3 - t.ships) * 2.2
+                base += max(0.0, 17.9 - t.ships) * 2.2
             if self.ffa_opening and t.owner == -1:
-                base += t.production * 28.1
+                base += t.production * 26.4
                 base += max(0.0, 18.0 - t.ships) * 0.9
                 if t.production >= 3 and t.ships <= 16:
                     base += 24.0
             if self.ffa_behind and t.owner == self.leader_owner:
-                base += 113.5
+                base += 147.4
             if t.owner == self.leader_owner:
                 base += 72.0
             elif (not self.ffa_opening) and self.weakest_enemy_owner >= 0 and t.owner == self.weakest_enemy_owner:
-                base += 183.8  # Elimination drive: focus-fire to remove weakest player (FFA, post-opening)
+                base += 130.2  # Elimination drive: focus-fire to remove weakest player (FFA, post-opening)
             elif t.owner not in (-1, w.player):
                 base += min(42.0, self.owner_power.get(t.owner, 0.0) / 45.0)
             # Weak-target bonus (garrison discount).
-            base += max(0.0, 22.8 - t.ships) * 0.9
+            base += max(0.0, 26.2 - t.ships) * 0.9
             # V33-clean2: VULTURE OFFENSE. Enemy planets that just launched are
             # transiently weak (their ships are in flight elsewhere). Bonus
             # scales with the fraction of their force that is currently away
@@ -645,7 +645,7 @@ class Context:
                         break
             
             if is_conflict:
-                base += 38.0
+                base += 34.4
             
             # V19.1 UPGRADE 2: Comet Harvesting — grab long-lived low-garrison comets.
             if t.id in w.comet_paths:
@@ -1105,27 +1105,27 @@ def _best_move_for_source(source, surplus, world, ctx, excluded_targets=None):
             base += LOCALITY_BONUS_MAX * (1.0 - distance / LOCALITY_RADIUS)
 
         if ctx.duel_opening and target.owner == -1:
-            score = base - send * 1.14 - distance * 1.60 - eta * 2.00
+            score = base - send * 1.14 - distance * 1.32 - eta * 2.00
             if target.production >= 3:
-                score += 39.2
+                score += 38.4
             if target.ships <= 12:
-                score += 28.0
+                score += 25.7
             # In duels, raw tempo matters more than pure efficiency.
             score /= math.sqrt(max(1, send))
         elif ctx.ffa_opening and target.owner == -1:
-            score = base - send * 1.88 - distance * 0.57 - eta * 1.26
+            score = base - send * 1.88 - distance * 0.88 - eta * 1.26
             if target.production >= 3:
                 score += 15.9
             if target.ships <= 14:
                 score += 14.8
             score /= max(1.0, math.sqrt(max(1, send)) * 1.35)
         else:
-            score = base - send * 1.90 - distance * 0.53 - eta * 1.30
+            score = base - send * 2.29 - distance * 0.53 - eta * 1.04
             score /= max(1, send)  # efficiency-normalized
 
         # V31: Vulture follow-ups are near-free captures; reward them.
         if vulture_mode:
-            score += 35.0
+            score += 27.2
 
         # V20: Simulate only if this move is a candidate for the top spot.
         if (priority, -score) < best_rank or score > best_rank[1] - 40.0:
