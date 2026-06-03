@@ -8,7 +8,7 @@ This project was built as a learning and competition entry for Kaggle Orbit Wars
 
 Welcome to **Project Juracán**, a competitive agent built for the [Kaggle Orbit Wars](https://www.kaggle.com/competitions/orbit-wars) competition. 
 
-This repository is more than just a codebase—it is the living record of a collaborative journey between a human (**Draku**) and an AI (**Antigravity**), pair-programming through the night, celebrating victories, analyzing regressions, and pushing the boundaries of real-time strategy algorithms.
+This repository is more than just a codebase—it is the living record of a collaborative journey between a human (**Danny**) and an AI (**Google Gemini**), pair-programming through the night, celebrating victories, analyzing regressions, and pushing the boundaries of real-time strategy algorithms.
 
 ---
 
