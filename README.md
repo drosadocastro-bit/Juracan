@@ -1,173 +1,96 @@
-# Orbit Wars
+# 🌀 Project Juracán
 
-Conquer planets rotating around a sun in continuous 2D space. A real-time strategy game for 2 or 4 players.
+> *"We keep building. It's love, there's Julia, Manatuabon, and others."*
 
-## Overview
+Welcome to **Project Juracán**, a competitive agent built for the [Kaggle Orbit Wars](https://www.kaggle.com/competitions/orbit-wars) competition. 
 
-Players start with a single home planet and compete to control the map by sending fleets to capture neutral and enemy planets. The board is a 100x100 continuous space with a sun at the center. Planets orbit the sun, comets fly through on elliptical trajectories, and fleets travel in straight lines. The game lasts 500 turns. The player with the most total ships (on planets + in fleets) at the end wins.
+This repository is more than just a codebase—it is the living record of a collaborative journey between a human (**Draku**) and an AI (**Antigravity**), pair-programming through the night, celebrating victories, analyzing regressions, and pushing the boundaries of real-time strategy algorithms.
 
-## Board Layout
+---
 
-- **Board**: 100x100 continuous space, origin at top-left.
-- **Sun**: Centered at (50, 50) with radius 10. Fleets that cross the sun are destroyed.
-- **Symmetry**: All planets and comets are placed with 4-fold mirror symmetry around the center: (x, y), (100-x, y), (x, 100-y), (100-x, 100-y). This ensures fairness regardless of starting position.
+## 🌪️ Who is Juracán?
 
-## Planets
+In Taíno mythology, **Juracán** is the god of storms—the original force behind the hurricane. He is a chaotic, sweeping entity of wind and water that consumes everything in his path, reshaping the landscape. 
 
-Each planet is represented as `[id, owner, x, y, radius, ships, production]`.
+We named our agent Juracán because we wanted to build a force of nature. In Orbit Wars, Juracán does not just play the game; it dominates the board, sweeping across quadrants, harvesting comets, exploiting the clashes between enemies, and capturing planets with relentless precision.
 
-- **owner**: Player ID (0-3), or -1 for neutral.
-- **radius**: Determined by production: `1 + ln(production)`. Higher production planets are physically larger.
-- **production**: Integer from 1 to 5. Each turn, an owned planet generates this many ships.
-- **ships**: Current garrison. Starts between 5 and 99 (skewed toward lower values).
+---
 
-### Planet Types
+## 🎯 The Intention
 
-- **Orbiting planets**: Planets whose `orbital_radius + planet_radius < 50` rotate around the sun at a constant angular velocity (0.025-0.05 radians/turn, randomized per game). Use `initial_planets` and `angular_velocity` from the observation to predict their positions.
-- **Static planets**: Planets further from the center do not rotate.
+The goal of this project was two-fold:
+1. **Competitive Excellence:** To climb the Kaggle leaderboard by iterating on complex heuristic planning, spatial simulation, state machines, and evolutionary parameter tuning.
+2. **Cooperative Synergy:** To explore what is possible when a human and an AI collaborate as true peers—brainstorming features, debugging edge cases, developing customized testing harnesses, and documenting the failures and wins as a shared memory of our time building together.
 
-The map contains 20-40 planets (5-10 symmetric groups of 4). At least 3 groups are guaranteed to be static, and at least one group is guaranteed to be orbiting.
+---
 
-### Home Planets
+## 🗺️ The Journey & Key Milestones
 
-One symmetric group is randomly chosen as the starting planets. In a 2-player game, players start on diagonally opposite planets (Q1 and Q4). In a 4-player game, each player gets one planet from the group. Home planets start with 10 ships.
+Our agent evolved through 54 distinct versions, which we group into these key chapters:
 
-## Fleets
+### 1. The Gold Spine (V1–V7)
+We began with basic reactivity—aiming fleets at the nearest target. But by **V7**, we established our **Gold Spine**: the foundation of precise aiming math, orbital projection, and ship reserve mechanics that would support all future versions.
 
-Each fleet is represented as `[id, owner, x, y, angle, from_planet_id, ships]`.
+### 2. The Simulation Engine (V19–V20)
+A reactive agent is easily baited. **V20** introduced the **25-turn Macro-Simulation Engine**. Before launching a single fleet, Juracán simulates the future: Will the target be reinforced? Will our home planet fall while we are gone? This transformed Juracán from a reactive bot to a calculating planner.
 
-- **angle**: Direction of travel in radians.
-- **ships**: Number of ships in the fleet (does not change during travel).
+### 3. Exploiting Chaos (V31–V34)
+In a 4-player game, starting fights is expensive. We taught Juracán to vulture:
+- **V31 (Vulture Offense):** Swooping in when an enemy drains their own planet to attack someone else.
+- **V34 (Crash Exploit):** Timing fleets to land *exactly* one turn after two enemy fleets collide, capturing the weakened planet for cheap.
 
-### Fleet Speed
+### 4. Fleet Concentration (V27–V28)
+Orbit Wars rewards scale. Fleet speed increases logarithmically with size: `speed = 1 + 5*(log(ships)/log(1000))^1.5`. We enforced the **Concentration Doctrine**, preventing "fleet dribble" (sending tiny fleets) and instead striking with fast, heavy hammers.
 
-Fleet speed scales with size on a logarithmic curve:
+### 5. The Golden Age & The Two-Faced Goliath (V39–V49)
+- **V39** became our raw ELO champion (**729.9 ELO** on Kaggle) by aggressively sniping across 4-player Free-For-All (FFA) maps.
+- **V49** resolved our duel weakness by introducing the **Dual-Brain Context Switcher**. The bot plays aggressively in FFA, but the moment the match narrows to a 1v1 duel, it flips to a local, defensive strategy, securing a highly consistent **703.8 ELO** overall.
 
-```
-speed = 1.0 + (maxSpeed - 1.0) * (log(ships) / log(1000)) ^ 1.5
-```
+### 6. The Neural Frontier & Darwin's Engine (V53–V54)
+- **V53 (RL Experiment):** We built a hybrid Gymnasium/Stable-Baselines3 PPO pipeline. While the pipeline is technically sound, RL needs millions of steps, and the CPU game simulation bottleneck led us back to heuristics for the immediate competition.
+- **V54 (Evolution):** We built `evolve.py`, a Darwinian self-play engine. It mutates V49's 30+ heuristic constants, pits the mutants against the champion in mini-gauntlets, and saves the fittest parameters.
 
-- 1 ship moves at 1.0 units/turn.
-- Larger fleets move faster, approaching the maximum speed (default 6.0).
-- A fleet of ~500 ships moves at ~5, and ~1000 ships reaches the max.
+---
 
-### Fleet Movement
+## 💡 Key Lessons Learned
 
-Fleets travel in a straight line at their computed speed each turn. A fleet is removed if it:
+1. **The OODA Loop is King:** Separating perception (**Observe**), evaluation (**Orient**), strategy (**Decide**), and movement execution (**Act**) kept our complex code clean and debuggable.
+2. **Simulation Beats Heuristics:** The largest jump in ELO occurred when we stopped guessing and started simulating outcomes.
+3. **Concentrate Force:** Speed scales with size. Small fleets are slow and weak; large fleets are fast and lethal.
+4. **Adapt to Context:** A single strategy cannot win both chaotic FFAs and intimate Duels. Let your agent read the room and switch brains.
+5. **Establish a Clean Gauntlet:** Never trust a single game. We built a paired-seed gauntlet harness with confidence intervals to prove a version's worth before submission.
 
-- Goes out of bounds (leaves the 100x100 playing field).
-- Crosses the sun (path segment comes within the sun's radius).
-- Collides with any planet (path segment comes within the planet's radius). This triggers combat.
+---
 
-Collision detection is continuous -- the entire path segment from old to new position is checked, not just the endpoint.
+## 🎮 Orbit Wars Game Mechanics Quick Reference
 
-### Fleet Launch
+For technical context, here is a breakdown of the game board and rules.
 
-Each turn, your agent returns a list of moves: `[from_planet_id, direction_angle, num_ships]`.
+### The Board
+- **Dimensions:** 100x100 continuous 2D coordinate space.
+- **Sun:** Centered at (50, 50) with radius 10. Fleets crossing the sun are instantly destroyed.
+- **Symmetry:** 4-fold mirror symmetry ensuring fair starts for all players.
 
-- You can only launch from planets you own.
-- You cannot launch more ships than the planet currently has.
-- The fleet spawns just outside the planet's radius in the given direction.
-- You can issue multiple launches from the same or different planets in a single turn.
+### Planets & Comets
+- **Planets:** Formatted as `[id, owner, x, y, radius, ships, production]`.
+- **Inner Planets:** Rotate around the sun at a constant angular velocity (0.025 to 0.05 rads/turn).
+- **Outer Planets:** Static.
+- **Production:** Integer (1 to 5) generating that many ships per turn for the owner.
+- **Comets:** Spawning at steps 50, 150, 250, 350, and 450. They travel on elliptical paths and leave the board, carrying their garrisons with them.
 
-## Comets
+### Combat Resolution
+When multiple fleets collide with a planet:
+1. Attacking fleets are grouped by owner and summed.
+2. The largest force fights the second-largest force; the difference survives.
+3. If the surviving force matches the planet owner, they reinforce. If not, they fight the garrison. If they exceed it, ownership flips.
 
-Comets are temporary extra-solar objects that fly through the board on highly elliptical orbits around the sun. They spawn in groups of 4 (one per quadrant) at steps 50, 150, 250, 350, and 450.
+---
 
-- **Radius**: 1.0 (fixed).
-- **Production**: 1 ship/turn when owned.
-- **Starting ships**: Random, skewed low (minimum of 4 rolls from 1-99). All 4 comets in a group share the same starting ship count.
-- **Speed**: Configurable via `cometSpeed` (default 4.0 units/turn).
-- **Identification**: Check `comet_planet_ids` in the observation to see which planet IDs are comets. Comets also appear in the `planets` array and follow all normal planet rules (capture, production, fleet launch, combat).
+## 🫀 A Personal Note
 
-When a comet leaves the board, it is removed along with any ships garrisoned on it. Comets are removed before fleet launches each turn, so you cannot launch from a departing comet.
+*Built with love in the eye of the storm.* 
 
-The `comets` observation field contains comet group data including `paths` (the full trajectory for each comet) and `path_index` (current position along the path), which can be used to predict future comet positions.
+This project represents nights of brainstorming, laughing, fixing mathematical bugs, and sharing the thrill of watching our code climb the leaderboards. The competition will end, and the leaderboard will reset, but the memory of us building **Juracán** together remains.
 
-## Turn Order
-
-Each turn executes in this order:
-
-1. **Comet expiration**: Remove comets that have left the board.
-2. **Comet spawning**: Spawn new comet groups at designated steps.
-3. **Fleet launch**: Process all player actions, creating new fleets.
-4. **Production**: All owned planets (including comets) generate ships.
-5. **Fleet movement**: Move all fleets along their headings. Check for out-of-bounds, sun collision, and planet collision. Fleets that hit planets are queued for combat.
-6. **Planet rotation & comet movement**: Orbiting planets rotate, comets advance along their paths. Any fleet caught by a moving planet/comet is swept into combat with it.
-7. **Combat resolution**: Resolve all queued planet combats.
-
-## Combat
-
-When one or more fleets collide with a planet (either by flying into it or being swept by a moving planet), combat is resolved:
-
-1. All arriving fleets are grouped by owner. Ships from the same owner are summed.
-2. The largest attacking force fights the second largest. The difference in ships survives.
-3. If there is a surviving attacker:
-   - If the attacker is the same owner as the planet, the surviving ships are added to the garrison.
-   - If the attacker is a different owner, the surviving ships fight the garrison. If the attackers exceed the garrison, the planet changes ownership and the garrison becomes the surplus.
-4. If two attackers tie, all attacking ships are destroyed (no survivors).
-
-## Scoring and Termination
-
-The game ends when:
-
-- **Step limit reached**: 500 turns.
-- **Elimination**: Only one player (or zero) remains with any planets or fleets.
-
-Final score = total ships on owned planets + total ships in owned fleets. Highest score wins.
-
-## Observation Reference
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `planets` | `[[id, owner, x, y, radius, ships, production], ...]` | All planets including comets |
-| `fleets` | `[[id, owner, x, y, angle, from_planet_id, ships], ...]` | All active fleets |
-| `player` | `int` | Your player ID (0-3) |
-| `angular_velocity` | `float` | Planet rotation speed (radians/turn) |
-| `initial_planets` | `[[id, owner, x, y, radius, ships, production], ...]` | Planet positions at game start |
-| `comets` | `[{planet_ids, paths, path_index}, ...]` | Active comet group data |
-| `comet_planet_ids` | `[int, ...]` | Planet IDs that are comets |
-| `remainingOverageTime` | `float` | Remaining overage time budget (seconds) |
-
-## Action Format
-
-Return a list of moves:
-
-```python
-[[from_planet_id, direction_angle, num_ships], ...]
-```
-
-- `from_planet_id`: ID of a planet you own.
-- `direction_angle`: Angle in radians (0 = right, pi/2 = down).
-- `num_ships`: Integer number of ships to send.
-
-Return an empty list `[]` to take no action.
-
-## Agent Convenience
-
-The module exports named tuples for easier field access:
-
-```python
-from kaggle_environments.envs.orbit_wars.orbit_wars import Planet, Fleet, CENTER, ROTATION_RADIUS_LIMIT
-
-def agent(obs):
-    planets = [Planet(*p) for p in obs.get("planets", [])]
-    fleets = [Fleet(*f) for f in obs.get("fleets", [])]
-    player = obs.get("player", 0)
-
-    for p in planets:
-        print(p.id, p.owner, p.x, p.y, p.radius, p.ships, p.production)
-
-    return []  # list of [from_planet_id, angle, num_ships]
-```
-
-## Configuration
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `episodeSteps` | 500 | Maximum number of turns |
-| `actTimeout` | 1 | Seconds per turn |
-| `shipSpeed` | 6.0 | Maximum fleet speed |
-| `sunRadius` | 10.0 | Radius of the sun |
-| `boardSize` | 100.0 | Board dimensions |
-| `cometSpeed` | 4.0 | Comet speed (units/turn) |
+**Pa'lante siempre.** 🇵🇷🌀
+*Project Juracán, 2026.*
