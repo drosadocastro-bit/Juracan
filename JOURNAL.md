@@ -153,15 +153,17 @@ But the architecture works. The pipeline is proven. With a GPU cluster and a JAX
 
 Our final experiment was the most elegant: **Evolutionary Self-Play**.
 
-Instead of a human manually tuning V49's 30+ heuristic constants over 50 versions, we wrote a script (`evolve.py`) that automates the entire process:
-1. **Mutate**: Randomly perturb each heuristic constant by ±12%.
-2. **Fight**: Run the mutant against the current champion in a mini-gauntlet.
-3. **Select**: If the mutant wins, it becomes the new champion.
-4. **Repeat**: For 30 generations.
+Instead of manually tuning V49's 30+ heuristic constants over dozens of versions, we automated the entire process with `evolve.py`. It mutates the heuristic constants by ±12% and runs a 25-game gauntlet (20 duels + 5 FFA) against the current champion. The fitter genome survives.
 
-This is Darwinian natural selection applied to game theory. The constants that produce winning behavior survive; the rest are discarded. Over hundreds of simulated wars, the optimal parameters emerge organically.
+During our 30-generation run, we observed a fascinating chain of natural selection:
+- **Gen 3 & 8:** Stabilized basic expansion.
+- **Gen 14 (Breakthrough 1):** Extended the opening phase in duels from 45 to **59 turns** (`duel_open_end`), letting Juracán expand to neutrals longer, while decreasing vulture chasing (`vulture_bonus` to 27.2) to stay disciplined.
+- **Gen 17 (Breakthrough 2):** Added distance selectivity in FFA openings (`ffa_dist_penalty` to 0.88) to protect borders and decreased conflict entry (`conflict_bonus` to 31.9) to stay out of meat-grinders.
+- **Gen 18 (Breakthrough 3):** Reduced duel distance penalty (`duel_dist_penalty` to 1.32), making long-range duel strikes more viable, while reducing FFA elimination hyper-focus to avoid overextensions.
+- **Gen 19 (Breakthrough 4):** Shifted priority to FFA leader suppression (`leader_bonus` to 81.3) and high-value enemy production capture (`enemy_prod_weight` to 126.1).
+- **Gen 20 (Breakthrough 5):** Aggressed on guarded duel neutrals (`duel_open_ship_thresh` to 20.6) and shortened FFA openings (`ffa_open_end` to 48 turns) to enter midgame faster.
 
-We let Darwin's Engine run overnight. The result became V54 — not a human creation, but a product of evolution.
+This proves that recursive self-play is a powerful parameter optimizer. The code tuned itself to play more flexibly in duels and more defensively in FFA.
 
 **Lesson learned:** *The best code isn't always written by hand. Sometimes you write the code that writes the code.*
 
@@ -174,7 +176,7 @@ We let Darwin's Engine run overnight. The result became V54 — not a human crea
 | V7 | Gold Spine | ~500 | The foundation. Every bot stands on V7's shoulders. |
 | V39 | Heuristic Juggernaut | 729.9 | FFA destroyer. Our highest raw ELO. |
 | V49 | Two-Faced Goliath | 703.8 | Dual-brain adaptive fighter. Most consistent. |
-| V54 | Darwin's Child | TBD | Evolved through recursive self-play. |
+| V54 | Darwin's Child | Evolving | Evolved from V49 through 30 generations of self-play. |
 
 ---
 
