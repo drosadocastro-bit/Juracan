@@ -27,3 +27,7 @@ gauntlet*.txt
 # OS files
 .DS_Store
 Thumbs.db
+
+# Local monitor script
+monitor_and_shutdown.py
+
