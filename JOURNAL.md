@@ -155,13 +155,20 @@ Our final experiment was the most elegant: **Evolutionary Self-Play**.
 
 Instead of manually tuning V49's 30+ heuristic constants over dozens of versions, we automated the entire process with `evolve.py`. It mutates the heuristic constants by ±12% and runs a 25-game gauntlet (20 duels + 5 FFA) against the current champion. The fitter genome survives.
 
-During our 30-generation run, we observed a fascinating chain of natural selection:
+During our 30-generation run, we observed a fascinating chain of natural selection leading to 13 champion changes:
 - **Gen 3 & 8:** Stabilized basic expansion.
-- **Gen 14 (Breakthrough 1):** Extended the opening phase in duels from 45 to **59 turns** (`duel_open_end`), letting Juracán expand to neutrals longer, while decreasing vulture chasing (`vulture_bonus` to 27.2) to stay disciplined.
-- **Gen 17 (Breakthrough 2):** Added distance selectivity in FFA openings (`ffa_dist_penalty` to 0.88) to protect borders and decreased conflict entry (`conflict_bonus` to 31.9) to stay out of meat-grinders.
-- **Gen 18 (Breakthrough 3):** Reduced duel distance penalty (`duel_dist_penalty` to 1.32), making long-range duel strikes more viable, while reducing FFA elimination hyper-focus to avoid overextensions.
-- **Gen 19 (Breakthrough 4):** Shifted priority to FFA leader suppression (`leader_bonus` to 81.3) and high-value enemy production capture (`enemy_prod_weight` to 126.1).
-- **Gen 20 (Breakthrough 5):** Aggressed on guarded duel neutrals (`duel_open_ship_thresh` to 20.6) and shortened FFA openings (`ffa_open_end` to 48 turns) to enter midgame faster.
+- **Gen 14:** Extended the opening phase in duels from 45 to **59 turns** (`duel_open_end`), letting Juracán expand to neutrals longer, while decreasing vulture chasing (`vulture_bonus` to 27.2) to stay disciplined.
+- **Gen 17:** Added distance selectivity in FFA openings (`ffa_dist_penalty` to 0.88) to protect borders and decreased conflict entry (`conflict_bonus` to 31.9) to stay out of meat-grinders.
+- **Gen 18:** Reduced duel distance penalty (`duel_dist_penalty` to 1.32), making long-range duel strikes more viable, while reducing FFA elimination hyper-focus to avoid overextensions.
+- **Gen 19:** Shifted priority to FFA leader suppression (`leader_bonus` to 81.3) and high-value enemy production capture (`enemy_prod_weight` to 126.1).
+- **Gen 20:** Aggressed on guarded duel neutrals (`duel_open_ship_thresh` to 20.6) and shortened FFA openings (`ffa_open_end` to 48 turns) to enter midgame faster.
+- **Gen 24:** Balanced duel distance (`duel_dist_penalty` to 1.25) and increased reserve distance when behind in FFA (`ffa_behind_dist` to 36.5) to consolidate defense.
+- **Gen 25:** Tightened local consolidation in duels (`locality_radius` to 21.8) and broadened weak target snipes (`weak_target_thresh` to 31.5).
+- **Gen 26:** Fine-tuned FFA opening distance weight (`ffa_dist_penalty` to 0.83).
+- **Gen 27:** Shortened FFA openings to **45 turns** and increased midgame local bias (`mid_dist_penalty` to 0.71).
+- **Gen 28 (The Ultimate Champion):** Boosted enemy high-value planet targeting (`enemy_prod_weight` to 135.2), extended duel openings to **61 turns**, and lowered duel distance penalty (`duel_dist_penalty` to 1.16) for long-range strikes.
+
+Generations 29 and 30 mutants were unable to beat Generation 28, making Gen 28 the final champion of the evolutionary run (+0.637 gauntlet score over baseline).
 
 This proves that recursive self-play is a powerful parameter optimizer. The code tuned itself to play more flexibly in duels and more defensively in FFA.
 
@@ -176,7 +183,7 @@ This proves that recursive self-play is a powerful parameter optimizer. The code
 | V7 | Gold Spine | ~500 | The foundation. Every bot stands on V7's shoulders. |
 | V39 | Heuristic Juggernaut | 729.9 | FFA destroyer. Our highest raw ELO. |
 | V49 | Two-Faced Goliath | 703.8 | Dual-brain adaptive fighter. Most consistent. |
-| V54 | Darwin's Child | Evolving | Evolved from V49 through 30 generations of self-play. |
+| V54 | Darwin's Child | Pending | Evolved from V49 through 30 generations of self-play. |
 
 ---
 
