@@ -1,5 +1,9 @@
 # 🌀 Project Juracán
 
+Disclaimer
+
+This project was built as a learning and competition entry for Kaggle Orbit Wars. It is not a production system and is shared as a record of experimentation, strategy iteration, and human-AI collaboration.
+
 > *"We keep building. It's love, there's Julia, Manatuabon, and others."*
 
 Welcome to **Project Juracán**, a competitive agent built for the [Kaggle Orbit Wars](https://www.kaggle.com/competitions/orbit-wars) competition. 
