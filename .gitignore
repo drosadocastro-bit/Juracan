@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Large data arrays
+*.npz
+
+# Archives and environment zips
+*.zip
+
+# Deep Learning / Reinforcement Learning models
+models/
+
+# Game logs and replays
+logs/
+replays/
+__es_temp/
+
+# Temporary / Output files
+*.log
+*_out.txt
+test_output*.txt
+calibrate*.txt
+gauntlet*.txt
+
+# OS files
+.DS_Store
+Thumbs.db
