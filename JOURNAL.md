@@ -183,7 +183,7 @@ This proves that recursive self-play is a powerful parameter optimizer. The code
 | V7 | Gold Spine | ~500 | The foundation. Every bot stands on V7's shoulders. |
 | V39 | Heuristic Juggernaut | 729.9 | FFA destroyer. Our highest raw ELO. |
 | V49 | Two-Faced Goliath | 703.8 | Dual-brain adaptive fighter. Most consistent. |
-| V54 | Darwin's Child | Pending | Evolved from V49 through 30 generations of self-play. |
+| V54 | Darwin's Child | 733.9 | Evolved from V49 through 30 generations of self-play. |
 
 ---
 
